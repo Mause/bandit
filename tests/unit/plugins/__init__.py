@@ -19,7 +19,7 @@ from io import BytesIO
 from textwrap import dedent
 
 from bandit.core.config import BanditConfig
-import bandit.core.manager
+from bandit.core.manager import BanditManager
 
 
 def run_bandit_over_source_string(source):
@@ -30,7 +30,7 @@ def run_bandit_over_source_string(source):
     '''
     config = BanditConfig()
 
-    manager = bandit.core.manager.BanditManager(config=config, agg_type='vuln')
+    manager = BanditManager(config=config, agg_type='vuln')
     manager._parse_file('-', BytesIO(source.encode('utf-8')), ['-'])
 
     return [issue.as_dict() for issue in manager.get_issue_list()]
