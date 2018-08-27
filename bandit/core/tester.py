@@ -15,24 +15,20 @@
 # under the License.
 
 import copy
+from functools import wraps
+from io import BytesIO
 import logging
+from textwrap import dedent
 import warnings
 
+from bandit.core.config import BanditConfig
 from bandit.core import constants
 from bandit.core import context as b_context
+import bandit.core.manager
 from bandit.core import utils
 
 warnings.formatwarning = utils.warnings_formatter
 LOG = logging.getLogger(__name__)
-
-
-from functools import wraps
-from io import BytesIO
-from textwrap import dedent
-
-import bandit.core.manager
-from bandit.core.config import BanditConfig
-
 
 
 class BanditTester(object):
@@ -121,7 +117,8 @@ class BanditTester(object):
 
 
 def run_bandit_over_source_string(source):
-    '''
+    '''Run's Bandit against the given source
+
     This method uses the same approach as the CLI for Bandit when processing
     input from stdin.
     '''
@@ -134,9 +131,7 @@ def run_bandit_over_source_string(source):
 
 
 def example_file(filename):
-    '''
-    Decorator which is used to execute bandit tests against a specified file
-    '''
+    'Decorator which is used to execute bandit tests against a specified file'
     def first(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -151,9 +146,7 @@ def example_file(filename):
 
 
 def example(source):
-    '''
-    Decorator which is used to execute bandit tests against a string.
-    '''
+    'Decorator which is used to execute bandit tests against a string.'
     def first(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
