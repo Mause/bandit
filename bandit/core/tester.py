@@ -36,9 +36,8 @@ from unittest import TestCase
 from textwrap import dedent
 
 import bandit.core.manager
-
 from bandit.core.config import BanditConfig
-from bandit.core.manager import BanditManager
+
 
 
 class BanditTester(object):
@@ -133,7 +132,7 @@ def run_bandit_over_source_string(source):
     '''
     config = BanditConfig()
 
-    manager = BanditManager(config=config, agg_type='vuln')
+    manager = bandit.core.manager.BanditManager(config=config, agg_type='vuln')
     manager._parse_file('-', BytesIO(source.encode('utf-8')), ['-'])
 
     return [issue.as_dict() for issue in manager.get_issue_list()]
@@ -147,7 +146,7 @@ def example_file(filename):
         @wraps(func)
         def wrapper(*args, **kwargs):
             with open(filename) as fh:
-                return func(*args, run_for(fh.read()), **kwargs)
+                return func(*args, run_bandit_over_source_string(fh.read()), **kwargs)
         return wrapper
     return first
 
