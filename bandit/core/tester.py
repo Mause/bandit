@@ -139,9 +139,13 @@ def example_file(filename):
     '''
     def first(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             with open(filename) as fh:
-                return func(*args, run_bandit_over_source_string(fh.read()), **kwargs)
+                return func(
+                    self,
+                    run_bandit_over_source_string(fh.read()),
+                    *args, **kwargs
+                )
         return wrapper
     return first
 
@@ -152,7 +156,11 @@ def example(source):
     '''
     def first(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(*args, run_bandit_over_source_string(dedent(source)), **kwargs)
+        def wrapper(self, *args, **kwargs):
+            return func(
+                self,
+                run_bandit_over_source_string(dedent(source)),
+                *args, **kwargs
+            )
         return wrapper
     return first
