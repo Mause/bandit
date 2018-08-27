@@ -15,16 +15,11 @@
 # under the License.
 
 import copy
-from functools import wraps
-from io import BytesIO
 import logging
-from textwrap import dedent
 import warnings
 
-from bandit.core.config import BanditConfig
 from bandit.core import constants
 from bandit.core import context as b_context
-import bandit.core.manager
 from bandit.core import utils
 
 warnings.formatwarning = utils.warnings_formatter
@@ -114,46 +109,3 @@ class BanditTester(object):
         import traceback
         what += traceback.format_exc()
         LOG.error(what)
-
-
-def run_bandit_over_source_string(source):
-    '''Run's Bandit against the given source
-
-    This method uses the same approach as the CLI for Bandit when processing
-    input from stdin.
-    '''
-    config = BanditConfig()
-
-    manager = bandit.core.manager.BanditManager(config=config, agg_type='vuln')
-    manager._parse_file('-', BytesIO(source.encode('utf-8')), ['-'])
-
-    return [issue.as_dict() for issue in manager.get_issue_list()]
-
-
-def example_file(filename):
-    'Decorator which is used to execute bandit tests against a specified file'
-    def first(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            with open(filename) as fh:
-                return func(
-                    self,
-                    run_bandit_over_source_string(fh.read()),
-                    *args, **kwargs
-                )
-        return wrapper
-    return first
-
-
-def example(source):
-    'Decorator which is used to execute bandit tests against a string.'
-    def first(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            return func(
-                self,
-                run_bandit_over_source_string(dedent(source)),
-                *args, **kwargs
-            )
-        return wrapper
-    return first
