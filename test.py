@@ -16,7 +16,6 @@
 import sys
 import json
 from functools import wraps
-from io import StringIO
 from io import BytesIO
 from unittest import main
 from unittest import TestCase
