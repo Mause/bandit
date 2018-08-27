@@ -16,12 +16,8 @@
 import sys
 import json
 from functools import wraps
-from itertools import groupby
 from io import StringIO
 from io import BytesIO
-from operator import itemgetter
-from subprocess import PIPE
-from subprocess import Popen
 from unittest import main
 from unittest import TestCase
 from textwrap import dedent
