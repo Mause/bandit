@@ -26,6 +26,21 @@ warnings.formatwarning = utils.warnings_formatter
 LOG = logging.getLogger(__name__)
 
 
+import sys
+import json
+from functools import wraps
+from io import StringIO
+from io import BytesIO
+from unittest import main
+from unittest import TestCase
+from textwrap import dedent
+
+import bandit.core.manager
+
+from bandit.core.config import BanditConfig
+from bandit.core.manager import BanditManager
+
+
 class BanditTester(object):
     def __init__(self, testset, debug, nosec_lines):
         self.results = []
@@ -109,3 +124,41 @@ class BanditTester(object):
         import traceback
         what += traceback.format_exc()
         LOG.error(what)
+
+
+def run_bandit_over_source_string(source):
+    '''
+    This method uses the same approach as the CLI for Bandit when processing
+    input from stdin.
+    '''
+    config = BanditConfig()
+
+    manager = BanditManager(config=config, agg_type='vuln')
+    manager._parse_file('-', BytesIO(source.encode('utf-8')), ['-'])
+
+    return [issue.as_dict() for issue in manager.get_issue_list()]
+
+
+def example_file(filename):
+    '''
+    Decorator which is used to execute bandit tests against a specified file
+    '''
+    def first(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            with open(filename) as fh:
+                return func(*args, run_for(fh.read()), **kwargs)
+        return wrapper
+    return first
+
+
+def example(source):
+    '''
+    Decorator which is used to execute bandit tests against a string.
+    '''
+    def first(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, run_bandit_over_source_string(dedent(source)), **kwargs)
+        return wrapper
+    return first

@@ -36,8 +36,6 @@ LOG = logging.getLogger(__name__)
 
 class BanditManager(object):
 
-    scope = []
-
     def __init__(self, config, agg_type, debug=False, verbose=False,
                  profile=None, ignore_nosec=False):
         '''Get logger, config, AST handler, and result store ready

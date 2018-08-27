@@ -25,8 +25,17 @@ from textwrap import dedent
 from bandit.core.config import BanditConfig
 from bandit.core.manager import BanditManager
 
+'''
+This module defines two decorators which are intended to be used within unit
+test modules to (1) simplify and isolate tests; (2) avoid going to disk.
+'''
 
-def run_for(source):
+
+def run_bandit_over_source_string(source):
+    '''
+    This method uses the same approach as the CLI for Bandit when processing
+    input from stdin.
+    '''
     config = BanditConfig()
 
     manager = BanditManager(config=config, agg_type='vuln')
@@ -36,6 +45,9 @@ def run_for(source):
 
 
 def example_file(filename):
+    '''
+    Decorator which is used to execute bandit tests against a specified file
+    '''
     def first(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -46,12 +58,36 @@ def example_file(filename):
 
 
 def example(source):
+    '''
+    Decorator which is used to execute bandit tests against a string.
+    '''
     def first(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            return func(*args, run_for(dedent(source)), **kwargs)
+            return func(*args, run_bandit_over_source_string(dedent(source)), **kwargs)
         return wrapper
     return first
+
+
+STATIC_SUBPROCESS_NO_SHELL = '''
+import subprocess
+
+def f():
+    print(subprocess.check_output(['/usr/bin/ls']))
+'''
+
+class FalseNegatives(TestCase):
+
+    @example(STATIC_SUBPROCESS_NO_SHELL)
+    def test_it(self,results):
+        '''
+        The simple 'ls' command not in a shell and with no user arguments should not produce an exception
+        '''
+
+        from pprint import pprint as pp
+        pp(results)
+        self.assertEqual(len(results), 0)
+
 
 
 class TestThing(TestCase):
