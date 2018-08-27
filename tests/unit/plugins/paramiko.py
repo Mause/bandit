@@ -1,7 +1,7 @@
 import bandit
 
-from bandit.core.tester import example
-from bandit.core.tester import example_file
+from . import example
+from . import example_file
 
 from unittest import TestCase
 
