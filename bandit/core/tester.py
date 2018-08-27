@@ -26,13 +26,8 @@ warnings.formatwarning = utils.warnings_formatter
 LOG = logging.getLogger(__name__)
 
 
-import sys
-import json
 from functools import wraps
-from io import StringIO
 from io import BytesIO
-from unittest import main
-from unittest import TestCase
 from textwrap import dedent
 
 import bandit.core.manager
